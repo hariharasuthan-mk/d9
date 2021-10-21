@@ -1,0 +1,104 @@
+<?php
+
+/**
+ * @file
+ * Manages Text Image.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\media\Entity\Media;
+use Drupal\paragraphs\Entity\Paragraph;
+use Drupal\file\Entity\File;
+use Drupal\image\Entity\ImageStyle;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\node\Entity\Node;
+
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ */
+function text_image_theme_suggestions_paragraph_alter(&$suggestions, $variables) {
+  $paragraph = $variables['elements']['#paragraph']; 
+
+  if ($paragraph->getType() == 'text_image') {
+    $node = \Drupal::request()->attributes->get('node');//$template_val = $node->getType();
+    $template_val = 'default';
+    $suggested_template  = 'paragraph__' . $paragraph->bundle() . '__'.$template_val;//print  $suggested_template;   
+
+    if (!empty($paragraph->bundle())) {      
+      $suggestions[] = $suggested_template;
+    }   
+
+  }
+
+}
+
+/**
+ * Register a theme for each paragraph type using HOOK_theme.
+ 
+function text_image_theme($existing, $type, $theme, $path) {
+  $entityManager = \Drupal::service('entity_field.manager');
+  
+  $themes = [];
+  foreach ($fields['field_component_template']->getSettings()['allowed_values'] as $key => $value) {
+    $hook_name = 'paragraph__c_sideimagetext__' . $key;
+    $template_name = 'paragraph--c-sideimagetext--' . str_replace("_", "-", $key);
+    $themes[$hook_name] = [
+      'template' => $template_name,
+      'base hook' => 'paragraphs',
+    ];
+  }
+  return $themes;
+}
+
+*/
+
+
+/**
+ * Implements template_preprocess_paragraph().
+ */
+
+function text_image_preprocess_paragraph(&$variables) {
+  $paragraph = $variables['elements']['#paragraph'];
+  $lang = \Drupal::languageManager()->getCurrentLanguage()->getId();	    
+  if ($paragraph->hasTranslation($lang)) {
+    $paragraph = $paragraph->getTranslation($lang);
+  }
+  $paragraph_type = $paragraph->getType();
+
+  if ($paragraph_type === 'text_image') {
+
+    if ($paragraph->hasField('field_position') && !empty($paragraph->get('field_position')->getValue())) {
+            $bdy2 = $paragraph->get('field_position')->first()->get('value')->getString();              
+            $variables['position']   =  $bdy2; 
+    }
+
+    if ($paragraph->hasField('field_image') && !empty($paragraph->get('field_image')->first())) {
+      $uri = $paragraph->get('field_image')->entity->getFileUri();//$url = file_create_url($uri);$variables['img_src']   =  $url; 
+      $image_url = ImageStyle::load('large')->buildUrl($uri);
+      $variables['img_src']   = $image_url ;      
+
+    }
+
+    if (!empty($paragraph->get('field_title')->first())) {
+      $variables['card_title'] = trim($paragraph->get('field_title')->first()->get('value')->getString());
+    }
+    else {
+      $variables['card_title'] = '';
+    }
+
+    if ($paragraph->hasField('field_wrap_text') && !empty($paragraph->get('field_wrap_text')->getValue())) {
+      $wrap = $paragraph->get('field_wrap_text')->first()->get('value')->getString();              
+      $variables['opt_wrap']   =  $wrap; 
+    }
+
+    if ($paragraph->hasField('field_description') && !empty($paragraph->get('field_description')->getValue())) {    
+     $body_strip = $paragraph->get('field_description')->getValue()[0]['value'];
+     $variables['body_desc'] = $body_strip;
+    }
+
+    
+  }
+
+
+}
