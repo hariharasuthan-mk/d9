@@ -1,5 +1,5 @@
-name: 'Text + Image'
-description: "Provides Example content type and related configuration\r\nParagraph field Reference = Text + Image Paragraph (Title, Description, Image, Position, Wrap text) . "
+name: Text + Image Paragraph Bundle
+description: "A reusable Text +Image Paragraph bundle with Example content type and related configuration\r\nParagraph field Reference = Text + Image Paragraph (Title, Description, Image, Position, Wrap text) . "
 type: module
 core_version_requirement: '^8.9 || ^9'
 dependencies:
