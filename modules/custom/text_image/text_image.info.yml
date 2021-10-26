@@ -15,4 +15,3 @@ dependencies:
   - 'drupal:user'
   - 'entity_reference_revisions:entity_reference_revisions'
   - 'paragraphs:paragraphs'
-  - 'text_image:text_image'
